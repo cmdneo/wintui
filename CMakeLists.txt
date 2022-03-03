@@ -15,8 +15,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
-# add_library(modname modname/modname.c)
 add_library(wintui wintui/wintui.c wintui/strfmt.c)
+
+
 add_executable(main main.c)
 target_link_libraries(main wintui m)
 
