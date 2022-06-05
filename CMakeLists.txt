@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(WinTUI DESCRIPTION "Terminal based rendered" LANGUAGES C)
+project(WinTUI DESCRIPTION "Terminal based UI" LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
@@ -15,8 +15,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
-add_library(wintui wintui/wintui.c wintui/strfmt.c)
-
+add_library(wintui wintui/wintui.c)
 
 add_executable(main main.c)
 target_link_libraries(main wintui m)

@@ -22,14 +22,14 @@ typedef struct pixel {
 	rgb bg;
 	point2D pos;
 	char const *txt;
-	unsigned int bold : 1;
-	unsigned int dim : 1;
-	unsigned int italic : 1;
-	unsigned int underline : 1;
-	unsigned int blink : 1;
-	unsigned int inverse : 1;
-	unsigned int invisible : 1;
-	unsigned int strike : 1;
+	unsigned bold : 1;
+	unsigned dim : 1;
+	unsigned italic : 1;
+	unsigned underline : 1;
+	unsigned blink : 1;
+	unsigned inverse : 1;
+	unsigned invisible : 1;
+	unsigned strike : 1;
 } pixel;
 
 typedef struct surface {
@@ -56,7 +56,7 @@ surface *surface_init(int wait);
  */
 void surface_cleanup(surface *s);
 
-void surface_set(surface *s, int fg_cc, int bg_cc, unsigned flags);
+void surface_set(surface *s, rgb fg, rgb bg, unsigned flags);
 int surface_draw(surface *s, char const *txt, int x, int y);
 int surface_update(surface *s);
 
@@ -102,14 +102,14 @@ void wt_do(enum wt_action action);
 /* DATA MEMBERS */
 
 enum wt_pixel_flag {
-	TF_BOLD = (1 << 0),
-	TF_DIM = (1 << 1),
-	TF_ITALIC = (1 << 2),
-	TF_UNDERLINE = (1 << 3),
-	TF_BLINK = (1 << 4),
-	TF_INVERSE = (1 << 5),
-	TF_INVISIBLE = (1 << 6),
-	TF_STRIKE = (1 << 7),
+	TPF_BOLD = (1 << 0),
+	TPF_DIM = (1 << 1),
+	TPF_ITALIC = (1 << 2),
+	TPF_UNDERLINE = (1 << 3),
+	TPF_BLINK = (1 << 4),
+	TPF_INVERSE = (1 << 5),
+	TPF_INVISIBLE = (1 << 6),
+	TPF_STRIKE = (1 << 7),
 };
 
 enum wt_event {

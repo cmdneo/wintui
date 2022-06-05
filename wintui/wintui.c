@@ -20,7 +20,6 @@ int wt_set_raw(int minbytes, int wait)
 		return -1;
 
 	cfmakeraw(&t);
-	/* Set the maximum wait time 100ms */
 	t.c_cc[VTIME] = wait;
 	t.c_cc[VMIN] = minbytes;
 
@@ -144,19 +143,19 @@ static int surface_resize_buffer(surface *s)
 	}
 }
 
-void surface_set(surface *s, int fg_cc, int bg_cc, unsigned flags)
+void surface_set(surface *s, rgb fg, rgb bg, unsigned flags)
 {
 	s->curfmt = (pixel){
-		.fg = T_PALLETE[fg_cc],
-		.bg = T_PALLETE[bg_cc],
-		.bold = flags & TF_BOLD,
-		.dim = flags & TF_DIM,
-		.italic = flags & TF_ITALIC,
-		.underline = flags & TF_UNDERLINE,
-		.blink = flags & TF_BLINK,
-		.inverse = flags & TF_INVERSE,
-		.invisible = flags & TF_INVISIBLE,
-		.strike = flags & TF_STRIKE,
+		.fg = fg,
+		.bg = bg,
+		.bold = flags & TPF_BOLD,
+		.dim = flags & TPF_DIM,
+		.italic = flags & TPF_ITALIC,
+		.underline = flags & TPF_UNDERLINE,
+		.blink = flags & TPF_BLINK,
+		.inverse = flags & TPF_INVERSE,
+		.invisible = flags & TPF_INVISIBLE,
+		.strike = flags & TPF_STRIKE,
 	};
 }
 
