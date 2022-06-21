@@ -148,14 +148,14 @@ void surface_set(surface *s, rgb fg, rgb bg, unsigned flags)
 	s->curfmt = (pixel){
 		.fg = fg,
 		.bg = bg,
-		.bold = flags & TPF_BOLD,
-		.dim = flags & TPF_DIM,
-		.italic = flags & TPF_ITALIC,
-		.underline = flags & TPF_UNDERLINE,
-		.blink = flags & TPF_BLINK,
-		.inverse = flags & TPF_INVERSE,
-		.invisible = flags & TPF_INVISIBLE,
-		.strike = flags & TPF_STRIKE,
+		.bold = !!(flags & TPF_BOLD),
+		.dim = !!(flags & TPF_DIM),
+		.italic = !!(flags & TPF_ITALIC),
+		.underline = !!(flags & TPF_UNDERLINE),
+		.blink = !!(flags & TPF_BLINK),
+		.inverse = !!(flags & TPF_INVERSE),
+		.invisible = !!(flags & TPF_INVISIBLE),
+		.strike = !!(flags & TPF_STRIKE),
 	};
 }
 
@@ -179,9 +179,9 @@ int surface_draw(surface *s, char const *txt, int x, int y)
 
 surface *surface_init(int wait)
 {
-	surface *ret;
-	pixel *buf;
-	point2D tsize;
+	surface *ret = NULL;
+	pixel *buf = NULL;
+	point2D tsize = { 0 };
 
 	if (0 != ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_wsize)) {
 		fprintf(stderr, "Error: IOCTL call failed!\n");
@@ -233,7 +233,7 @@ int surface_update(surface *s)
 	 * Do not draw when the terminal size changes 
 	 * just clear the screen and reset text attrs
 	 */
-	if (s->tsize.x != g_wsize.ws_col && s->tsize.y != g_wsize.ws_row) {
+	if (s->tsize.x != g_wsize.ws_col || s->tsize.y != g_wsize.ws_row) {
 		s->tsize.x = g_wsize.ws_col;
 		s->tsize.y = g_wsize.ws_row;
 		s->ndeltas = 0;

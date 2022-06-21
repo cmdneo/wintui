@@ -35,12 +35,10 @@ int main()
 
 		surface_set(s, T_PALLETE[fg_col], T_PALLETE[TC_BLACK],
 			    TPF_BOLD);
-
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j <= i; j++)
 				surface_draw(s, "* ", j * 2, i);
 		}
-
 		event = surface_update(s);
 
 		if (++rows > 12) {
@@ -49,10 +47,10 @@ int main()
 			fg_col %= TC_COUNT;
 			rows = 0;
 		}
-		/* INFO: As per relative sensetivity of colors to the human eye 
+	}
+	/* INFO: As per relative sensetivity of colors to the human eye 
 	 * Greyscale = 299 * r + .587 * g + .114 * b 
 	 */
-	}
 
 	surface_cleanup(s);
 	return 0;
