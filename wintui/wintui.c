@@ -1,17 +1,26 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/ioctl.h>
 
 #include "wintui/wintui.h"
 
-/* Internal globals */
+#define DEBUG(...) fprintf(stderr, __VA_ARGS__)
 
+/* Internal globals */
 static struct termios g_old_termios;
 static struct winsize g_wsize;
 
 enum { INIT_BUF_CAP = 256 };
+
+static void handle_sigwinch(int sig)
+{
+	assert(sig == SIGWINCH);
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_wsize);
+}
 
 int wt_set_raw(int minbytes, int wait)
 {
@@ -31,8 +40,7 @@ int wt_set_raw(int minbytes, int wait)
 int wt_restore()
 {
 	if (0 != tcsetattr(STDIN_FILENO, TCSADRAIN, &g_old_termios)) {
-		fprintf(stderr,
-			"ERROR: Failed to reset terminal back to normal mode!\n");
+		DEBUG("ERROR: Failed to reset terminal back to normal mode!\n");
 		return -1;
 	}
 	return 0;
@@ -109,7 +117,7 @@ static void pixel_write(pixel *p)
 	int y = p->pos.y;
 	wt_move_cursor(x, y);
 	wt_print("\x1b[38;2;%hhu;%hhu;%hhum\x1b[48;2;%hhu;%hhu;%hhum", p->fg.r,
-		 p->fg.g, p->fg.b, p->bg.r, p->bg.g, p->bg.b);
+	         p->fg.g, p->fg.b, p->bg.r, p->bg.g, p->bg.b);
 	if (p->bold)
 		wt_print("\x1b[1m");
 	if (p->dim)
@@ -184,7 +192,7 @@ surface *surface_init(int wait)
 	point2D tsize = { 0 };
 
 	if (0 != ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_wsize)) {
-		fprintf(stderr, "Error: IOCTL call failed!\n");
+		DEBUG("Error: IOCTL call failed!\n");
 		goto ERR;
 	} else {
 		tsize.x = g_wsize.ws_col;
@@ -192,10 +200,10 @@ surface *surface_init(int wait)
 	}
 	/* Roll back each step after error then and goto and return */
 	if (0 != tcgetattr(STDIN_FILENO, &g_old_termios)) {
-		fprintf(stderr, "Error: Termios failed!\n");
+		DEBUG("Error: Termios failed!\n");
 		goto ERR;
 	} else if (0 != wt_set_raw(0, wait)) {
-		fprintf(stderr, "Error: Termios failed!\n");
+		DEBUG("Error: Termios failed!\n");
 		goto ERR;
 	} else if (NULL == (ret = malloc(sizeof *ret))) {
 		wt_restore();
@@ -213,22 +221,21 @@ surface *surface_init(int wait)
 		.buf = buf,
 	};
 
+	// Signal handler for updating terminal size
+	signal(SIGWINCH, handle_sigwinch);
 	wt_enable(TM_ALTBUF);
 	wt_clear();
 
 	return ret;
 
 MEM_ERR:
-	fprintf(stderr, "Error: Memory allocation error!\n");
+	DEBUG("Error: Memory allocation error!\n");
 ERR: /* nothing */
 	return NULL;
 }
 
 int surface_update(surface *s)
 {
-	/* Update terminal size */
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &g_wsize);
-
 	/*
 	 * Do not draw when the terminal size changes 
 	 * just clear the screen and reset text attrs
